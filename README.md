@@ -42,7 +42,8 @@ Sign up through market place: [IBM Cloud Identity](https://www.ibm.com/us-en/mar
 Following the steps below will ensure you will have a working local OIDC application. 
 
 1. **Create an OIDC App in Cloud Identity Connect**
-Go to the IBM Cloud Identity portal and create a new application. Choose the custom application option. In Sign-On Method, choose `Open ID Connect 1.0`.
+Go to the IBM Cloud Identity portal and create a new application.
+Create an "OpenID Connect" application.
 
 1.1 **Enter the Application URL**
 By default the Application URL will listen on localhost port 3000. Enter `http://localhost:3000/` in the input field. 
@@ -72,7 +73,7 @@ npm install
 This is a hidden file in your filesystem within the Git repo folder. Edit it by typing `open .env` if on a mac or use vi on linux. If you are on Windows, you will need to set the variables manually in the JS file or find another solution. 
 Edit this file and save it. 
 ```
-OIDC_CI_BASE_URI=https://your-tenant-id.ice.ibmcloud.com/oidc/endpoint/default
+OIDC_CI_BASE_URI=https://your-tenant-id.ice.ibmcloud.com/oauth2
 OIDC_CLIENT_ID=XXXXXXXX-xxxx-xxxx-xxxx-XXXXXXXXXXXX
 OIDC_CLIENT_SECRET=YYYYYYYYYY
 OIDC_REDIRECT_URI=http://localhost:3000/oauth/callback
@@ -83,3 +84,17 @@ To run the app, run the following command via the terminal:
 `npm start`
 
 This will open a web server hosted on port 3000 at the folllowing address: http://localhost:3000
+
+
+# sqlite
+
+The session is stored in sqlite.
+To look at the data stored in the database, you can use `sqlite3` (on linux)
+
+````bash
+sqlite3 var/db/sessions.db
+.tables
+select * from sessions;
+7wxOs...a5x|7...1.0|{"cookie":{"originalMaxAge":null,"expires":null,"httpOnly":true,"path":"/"},"passport":{"user":{"id":"645003VYNM","username":"OOU7N9FQrf3NlVd6PHYUIDGkH3-sOm97Zrm4tCrERAU=","accessToken":"y1UWwJ1rmZ"}}}
+.quit
+````
