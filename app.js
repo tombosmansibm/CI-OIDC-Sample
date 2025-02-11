@@ -11,7 +11,8 @@ var session = require('express-session');
 // Use Passport with OpenId Connect strategy to
 // Authenticate users with IBM Cloud Identity Connect
 var passport = require('passport')
-var OpenIDStrategy = require('passport-openidconnect').Strategy
+// var OpenIDStrategy = require('passport-openidconnect').Strategy
+var OpenIDConnectStrategy = require('passport-openidconnect');
 
 var index = require('./routes/index');
 
@@ -20,7 +21,7 @@ var OIDC_BASE_URI = process.env.OIDC_CI_BASE_URI;
 
 // Configure the OpenId Connect Strategy
 // with credentials obtained from env details (.env)
-passport.use(new OpenIDStrategy({
+passport.use(new OpenIDConnectStrategy({
   issuer: OIDC_BASE_URI,
   clientID: process.env.OIDC_CLIENT_ID, // from .env file
   clientSecret: process.env.OIDC_CLIENT_SECRET, // from .env file

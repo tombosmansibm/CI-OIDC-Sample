@@ -30,7 +30,7 @@ router.get('/profile', function(req, res, next) {
 // GET profile
 router.get('/launchpad', function(req, res, next) {
 
-  request.get(`https://casesecurity.ice.ibmcloud.com/v1.0/user/applications`, {
+  request.get(`https://tom.verify.ibm.com/v1.0/user/applications`, {
     'auth': {
       'bearer': req.session.accessToken
     }
