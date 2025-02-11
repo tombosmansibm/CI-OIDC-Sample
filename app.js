@@ -32,7 +32,8 @@ passport.use(new OpenIDConnectStrategy({
   passReqToCallback: true
 },
 function(req, issuer, userId, profile, accessToken, refreshToken, params, cb) {
-  // Log the session in the console.
+  // Log the session in the console
+  console.log('----------------------');
   console.log('issuer:', issuer);
   console.log('userId:', userId);
   console.log('accessToken:', accessToken);
