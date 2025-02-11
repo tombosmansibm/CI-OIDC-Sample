@@ -2,7 +2,7 @@ var request = require('request');
 var express = require('express');
 var router = express.Router();
 var OIDC_BASE_URI = process.env.OIDC_CI_BASE_URI;
-var OIDC_TOKEN_URI = OIDC_BASE_URI+'/oidc/endpoint/default';
+var OIDC_TOKEN_URI = OIDC_BASE_URI+'/token';
 
 // GET profile
 router.get('/profile', function(req, res, next) {
