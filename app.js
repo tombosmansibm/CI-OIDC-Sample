@@ -6,8 +6,9 @@ var path = require('path');
 var favicon = require('serve-favicon');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
+//
 var session = require('express-session');
-
+var SQLiteStore = require('connect-sqlite3')(session);
 // Use Passport with OpenId Connect strategy to
 // Authenticate users with IBM Cloud Identity Connect
 var passport = require('passport')
@@ -29,21 +30,27 @@ passport.use(new OpenIDConnectStrategy({
   userInfoURL: `${OIDC_BASE_URI}/userinfo`, // this won't change
   tokenURL: `${OIDC_BASE_URI}/token`, // this won't change
   callbackURL: process.env.OIDC_REDIRECT_URI, // from .env file
+  //scope: ['openid', 'profile'],
   passReqToCallback: true
-},
-function(req, issuer, userId, profile, accessToken, refreshToken, params, cb) {
-  // Log the session in the console
-  console.log('----------------------');
-  console.log('issuer:', issuer);
-  console.log('userId:', userId);
-  console.log('accessToken:', accessToken);
-  console.log('refreshToken:', refreshToken);
-  console.log('params:', params);
+  },
+  function verify(req, issuer, userId, profile, idToken, accessToken, refreshToken, params, cb) {
+    // Log the session in the console
+    console.log('----------------------');
+    console.log('issuer:', issuer);
+    console.log('userId:', userId);
+    console.log('profile:', profile);
+    console.log('idToken:', idToken);
+    console.log('accessToken:', accessToken);
+    console.log('refreshToken:', refreshToken);
+    console.log('params:', params);
 
-  req.session.accessToken = accessToken;
+    // req.session.accessToken = accessToken;
+    userId.accessToken = accessToken;
+    // res.locals
+    // session.userData.accessToken = accessToken;
 
-  return cb(null, profile);
-}));
+    return cb(null, userId);
+ }));
 
 passport.serializeUser(function(user, done) {
   done(null, user);
@@ -68,17 +75,19 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(session({
   secret: 'protect the world',
   resave: false,
-  saveUninitialized: true
+  saveUninitialized: false,
+  store: new SQLiteStore({ db: 'sessions.db', dir: './var/db' })
 }))
 
 // Initialize Passport
-app.use(passport.initialize());
-app.use(passport.session());
+//app.use(passport.initialize());
+//app.use(passport.session());
 
 // Middleware for checking if a user has been authenticated
 // via Passport and IBM OpenId Connect
 function checkAuthentication(req,res,next){
-  if(req.isAuthenticated()){
+  if (Object.hasOwn(req.session, 'passport')) {
+      console.log("User is authenticated " + req.session.passport.user.id);
       next();
   } else{
       res.redirect("/");
@@ -87,17 +96,20 @@ function checkAuthentication(req,res,next){
 
 app.use('/', index);
 // Only allow authenticated users to access the /users route
+
 app.use('/users', checkAuthentication, index);
 app.use('/profile', checkAuthentication, index);
 // Initiates an authentication request with IBM
 // The user will be redirect to IBM and once authenticated
 // they will be returned to the callback handler below
-app.get('/login', passport.authenticate('openidconnect', {
-  successReturnToOrRedirect: "/",
-  scope: 'email profile'
+app.get('/login', passport.authenticate('openidconnect')
+//{
+//  successReturnToOrRedirect: "/",
+//  scope: 'openid email profile'
   // Add login hint for social if necessary
   // login_hint: `{"realm":"www.linkedin.com"}`
-}));
+//}
+);
 
 // Callback handler that IBM will redirect back to
 // after successfully authenticating the user

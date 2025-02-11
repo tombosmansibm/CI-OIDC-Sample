@@ -3,16 +3,17 @@ var express = require('express');
 var router = express.Router();
 var OIDC_BASE_URI = process.env.OIDC_CI_BASE_URI;
 
-// GET homepage 
-router.get('/', function(req, res, next) {
+var session = require('express-session');
 
-  if(req.session.accessToken){
+// GET homepage
+router.get('/', function(req, res, next) {
+  // can i now read from the
+  if (Object.hasOwn(req.session, 'passport')) {
+    // means we're logged in
     // Log the user profile
-    console.log(req.user);
-    
     res.render('users', {
       title: 'Users',
-      user: req.user,
+      user: req.session.passport.user,
       loggedin: (req.query.loggedin == 'success') ? true : false
     });
   }
@@ -26,14 +27,23 @@ router.get('/', function(req, res, next) {
 });
 
 // GET profile
-router.get('/profile', function(req, res, next) {
+router.get('/profile', (req, res, next) => {
+  var at = "";
+  if (Object.hasOwn(req.session, 'passport')) {
+    // means we're logged in
+    at = req.session.passport.user.accessToken;
+    console.log("PROFILE ACCESS TOKEN: "+at);
+  }
+  var __request = {
+        url: `${OIDC_BASE_URI}/userinfo`,
+        headers: {
+            'Authorization': 'Bearer '+at
+        }
+        };
+  console.log(__request);
+  request.get(__request, function(err, response, body){
 
-  request.get(`${OIDC_BASE_URI}/userinfo`, {
-    'auth': {
-      'bearer': req.session.accessToken
-    }
-  },function(err, response, body){
-
+    //console.log(response.headers)
     console.log('User Info')
     console.log(body);
 
@@ -49,15 +59,20 @@ router.get('/profile', function(req, res, next) {
 });
 
 router.get('/introspect', function(req, res, next) {
-
+  var at = "";
+  if (Object.hasOwn(req.session, 'passport')) {
+    // means we're logged in
+    at = req.session.passport.user.accessToken;
+    console.log("INTROSPECT ACCESS TOKEN: "+at);
+  }
   request.post(`${OIDC_BASE_URI}/introspect`, {
     'form': {
       'client_id': process.env.OIDC_CLIENT_ID,
       'client_secret': process.env.OIDC_CLIENT_SECRET,
-      'token': req.session.accessToken,
+      'token': at,
       'token_type_hint': 'access_token'
       }
-    },function(err, response, body){
+    }, function(err, response, body){
 
     console.log('Introspect output')
     console.log(body);
