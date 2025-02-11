@@ -33,7 +33,7 @@ Configure Node and Github with the following links: [NodeJS](https://nodejs.org/
 2. **Create a tenant in Cloud Identity**
 Sign up through market place: [IBM Cloud Identity](https://www.ibm.com/us-en/marketplace/cloud-identity)
 3. **Clone this repo on your machine**
-`git clone https://github.ibm.com/ajcase/CIC-OIDCSample`
+`git clone https://github.com/tombosmansibm/CI-OIDC-Sample`
 
 **Note:** If you want to make modifications to the UI, this app is built in the [IBM's Carbon Design System](https://carbondesignsystem.com) using [Vanilla JS](https://the-carbon-components.netlify.com/) patterns.
 
